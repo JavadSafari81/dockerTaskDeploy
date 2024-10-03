@@ -2,9 +2,11 @@ FROM python:3.9.20-alpine3.20
 
 WORKDIR /app
 
+RUN apk add gcc musl-dev postgresql-dev
+
 COPY requirements.txt requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
