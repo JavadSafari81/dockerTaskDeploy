@@ -61,15 +61,18 @@ FROM python:3.9.20-alpine3.20
 
 WORKDIR /app
 
+RUN apk add gcc musl-dev postgresql-dev
+
 COPY requirements.txt requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
 ENV PATH="/mysite/venv/bin:$PATH"
 
 CMD ["python", "./mysite/djangoProject/manage.py", "runserver", "0.0.0.0:8000"]
+
 ```
 
 ### Laravel:
@@ -125,6 +128,14 @@ services:
   django:
     container_name: mydjango
     image: mydjango:latest
+    depends_on:
+      - djangodb
+    environment:
+      DB_NAME: djangodb
+      DB_USER: jj
+      DB_PASSWORD: mjrude1212
+      DB_HOST: djangodb
+      DB_PORT: 5432
     networks:
       pnet:
         ipv4_address: 192.168.55.102
@@ -132,9 +143,47 @@ services:
   laravel:
     container_name: mylaravel
     image: mylaravel:latest
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: laraveldb
+      DB_PORT: 3306
+      DB_DATABASE: laraveldb
+      DB_USERNAME: jj
+      DB_PASSWORD: mjrude1212
     networks:
       pnet:
         ipv4_address: 192.168.55.103
+
+  djangodb:
+    container_name: djangodb
+    image: postgres:latest
+    volumes:
+      - postgresqldb:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: jj
+      POSTGRES_PASSWORD: mjrude1212
+      POSTGRES_DB: djangodb
+    networks:
+      pnet:
+       ipv4_address: 192.168.55.104
+    expose:
+      - '5432'
+
+  laraveldb:
+    container_name: laraveldb
+    image: mysql:latest
+    volumes:
+      - mysqldb:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: laraveldb
+      MYSQL_USER: jj
+      MYSQL_PASSWORD: mjrude1212
+      MYSQL_ROOT_PASSWORD: mjrude1212
+    networks:
+      pnet:
+        ipv4_address: 192.168.55.105
+    expose:
+      - '3306'
 
 networks:
   pnet:
@@ -143,4 +192,14 @@ networks:
       config:
         - subnet: 192.168.55.0/24
     name: pnet
+
+volumes:
+  postgresqldb:
+  mysqldb:
+```
+
+### Git
+You can reach Files in git repo:
+```
+https://github.com/JavadSafari81/dockerTaskDeploy.git
 ```
