@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  nginx:
+    container_name: mynginx
+    image: mynginx:latest
+    ports:
+      - "80:80"
+    networks:
+      pnet:
+        ipv4_address: 192.168.55.101
+
+  django:
+    container_name: mydjango
+    image: mydjango:latest
+    networks:
+      pnet:
+        ipv4_address: 192.168.55.102
+
+  laravel:
+    container_name: mylaravel
+    image: mylaravel:latest
+    networks:
+      pnet:
+        ipv4_address: 192.168.55.103
+
+networks:
+  pnet:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.55.0/24
+    name: pnet
